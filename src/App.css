@@ -5,36 +5,45 @@
 }
 .container {
   display: grid;
-  width: 100%;
-  background: #000;
-  grid-template-columns: 1fr 150px 1fr;
-  height: 100vh;
+  width: 100wh;
+  background: rgba(0, 0, 0, 0.458);
+  grid-template-columns: 1fr 110px 1fr;
+  min-height: 100vh;
+  background: rgb(18, 72, 125);
 }
 .input-Field,
 .output-Field {
-  display: flex;
-  background: rgb(0, 0, 0);
+  display: grid;
+  grid-template-columns: 80px 1fr;
   padding: 20px;
 }
-textarea {
-  width: 100%;
-  height: 100%;
+textarea, pre {
+  /* width: 100%; */
+  min-height: 100%;
   resize: none;
   outline: none;
   border: 0;
-  background: rgb(104, 104, 104);
-  color: rgb(197, 197, 197);
+  background: rgba(0, 15, 40, 0.468);
+  color: rgb(123, 123, 123);
   font-size: 20px;
   padding: 20px;
   /* border-radius: 1rem; */
   /* word-wrap: ; */
 }
+pre{
+  color: rgba(132, 173, 255, 0.921);
+  overflow: scroll;
+  height: 100vh;
+  /* width: 10%; */
+}
+
 .btn {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 20px;
   flex-direction: column;
+  /* background: rgba(0, 0, 0, 0.968); */
 }
 .btn button {
   margin-top: 10px;
@@ -44,13 +53,13 @@ textarea {
   outline: 0;
   cursor: pointer;
   border-radius: 5px;
-  background: rgba(52, 93, 117, 0.363);
+  background: rgba(0, 15, 40, 0.468);
   color: white;
 }
 .line-count {
-  background: rgb(72, 72, 72);
+  background: rgba(8, 2, 31, 0.468);
   text-align: right;
-  width: 80px;
+  /* width: 80px; */
   padding: 20px 0;
   /* margin-top: 20px; */
   /* display: block; */

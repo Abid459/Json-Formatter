@@ -1,42 +1,42 @@
-*{
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
-.container{
+.container {
   display: grid;
-  width:100%;
+  width: 100%;
   background: #000;
   grid-template-columns: 1fr 150px 1fr;
   height: 100vh;
 }
-.input-Field, 
-.output-Field{
+.input-Field,
+.output-Field {
+  display: flex;
   background: rgb(0, 0, 0);
   padding: 20px;
-  
 }
-textarea{
-  width:100%;
+textarea {
+  width: 100%;
   height: 100%;
   resize: none;
   outline: none;
   border: 0;
   background: rgb(104, 104, 104);
-  color:rgb(197, 197, 197);
+  color: rgb(197, 197, 197);
   font-size: 20px;
   padding: 20px;
-  border-radius: 1rem;
+  /* border-radius: 1rem; */
+  /* word-wrap: ; */
 }
-.btn{
+.btn {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 20px;
   flex-direction: column;
-
 }
-.btn button{
+.btn button {
   margin-top: 10px;
   width: 100px;
   padding: 10px 20px;
@@ -46,4 +46,40 @@ textarea{
   border-radius: 5px;
   background: rgba(52, 93, 117, 0.363);
   color: white;
+}
+.line-count {
+  background: rgb(72, 72, 72);
+  text-align: right;
+  width: 80px;
+  padding: 20px 0;
+  /* margin-top: 20px; */
+  /* display: block; */
+}
+/* .line-count */
+/* width */
+.line-count::-webkit-scrollbar {
+  display: none;
+  /* width: 1px; */
+}
+
+.text-field::-webkit-scrollbar {
+  cursor: pointer;
+  width: 16px;
+}
+
+/* Track */
+.text-field::-webkit-scrollbar-track {
+  background: #f1f1f150;
+}
+
+/* Handle */
+.text-field::-webkit-scrollbar-thumb {
+  background: rgba(0, 43, 117, 0.529);
+  cursor: pointer;
+}
+
+/* Handle on hover */
+.text-field::-webkit-scrollbar-thumb:hover {
+  background: #555;
+  cursor: pointer;
 }

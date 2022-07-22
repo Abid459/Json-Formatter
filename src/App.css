@@ -25,7 +25,7 @@ textarea, pre {
   border: 0;
   background: rgba(0, 15, 40, 0.468);
   color: rgb(123, 123, 123);
-  font-size: 20px;
+  font-size: 14px;
   padding: 20px;
   /* border-radius: 1rem; */
   /* word-wrap: ; */
@@ -34,7 +34,27 @@ pre{
   color: rgba(132, 173, 255, 0.921);
   overflow: scroll;
   height: 100vh;
+  position: relative;
+  /* padding-top:10px ; */
   /* width: 10%; */
+}
+.open{
+
+  /* display: none; */
+  transition: 2s;
+}
+input[type='checkbox']{
+  /* background: #000; */
+  margin: 0;
+  padding: 0;
+  /* margin-left: 10px; */
+  /* display: inline; */
+  position: absolute;
+  left: 0px;
+}
+input[type='checkbox']:checked  .open{
+  /* height: 0px; */
+  display: none;
 }
 
 .btn {

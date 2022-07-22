@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 
 const Home = () => {
@@ -7,26 +7,27 @@ const Home = () => {
     const outputRef = useRef()
     const outputCountRef = useRef()
 
-    const [output,setOutput] = useState();
+    const [output, setOutput] = useState();
+    const [collapse, setCollapse] = useState(true);
 
+
+    const handleChange = (e) => {
+        // setCollapse(!collapse);
+        // console.log(collapse)
+        console.dir("Reading checked",e.target.checked)
+    }
 
     // scroll match of count and text editor
     const matchScroll = () => {
         inputCountRef.current.scrollTop = inputRef.current.scrollTop;
         inputRef.current.scrollTop = inputCountRef.current.scrollTop;
-
-
         inputCountRef.current.scrollLeft = inputRef.current.scrollLeft;
-
-
         outputCountRef.current.scrollTop = outputRef.current.scrollTop;
     }
 
 
-    let lineCountCache = 0;
-
+    //Tab key functionallity
     const checkTabKey = (e) => {
-
         if (e.code === 'Tab') {
             // e.target.value += "    ";
             const start = e.target.selectionStart;
@@ -37,8 +38,10 @@ const Home = () => {
         }
     }
 
+    //Function that count line
+    let lineCountCache = 0;
     const lineCountOut = (output) => {
-        console.log("changed")
+        // console.log("changed")
         let lineCount = output.split('\n').length;
         // console.log('Line count', lineCount)
         let countArr = [];
@@ -50,7 +53,9 @@ const Home = () => {
             outputCountRef.current.value = countArr.join('\n')
         }
     }
-    // outputRef.current.value = 'formated';
+
+
+    //Function for formating output
     const formatJSON = () => {
         // setOutput('auesdaihsud')
         const inputData = inputRef.current.value
@@ -60,38 +65,84 @@ const Home = () => {
         // console.log(typeof('input is',))
         try {
             const formated = JSON.stringify(JSON.parse(inputData), (key, value) => {
-                return typeof value === 'number' ?value : value
+                return typeof value === 'number' ? value : value
             }, 4);
             const nn = formated.split('\n');
-            // const ss = nn.split(':')
-            const mm = nn.map(n=>{
-                if(n.indexOf(':') > -1){
-                    let index = n.indexOf(':');
-                    let key = n.slice(0,index)
-                    let value = n.slice(index+1,n.length)
-                    let isNum = value.indexOf('"') === -1  && value.indexOf('{') === -1?true:false;
-                    let isStr = value.indexOf('"') !== -1  && value.indexOf('{') === -1?true:false;
-                    console.log('index of',value)
-                    return isNum? <> <span>{key+':'}</span> <span style={{'color':'#3FA0CF'}}>{value + '\n'}</span> </>:isStr? <> <span>{key+':'}</span> <span style={{'color':'#A9B6D8'}}>{value + '\n'}</span> </>: <span>{n+'\n'}</span> 
 
-                }else{
-                    return <span>{n+'\n'}</span>
+            // console.log("This is array",nn.split('}'))
+
+            let id = 0;
+            let mainArr = []
+            let objectArr = [];
+            let output
+            for (let i = 0; i < nn.length; i++) {
+                if (nn[i].indexOf('[') !== -1 || nn[i].indexOf(']') !== -1) {
+                    objectArr.push(nn[i])
+                    mainArr.push(objectArr)
+                    objectArr = []
+                    continue
+                }
+
+                else if (nn[i].indexOf('{') !== -1) {
+                    objectArr.push(nn[i])
+                } else if (nn[i].indexOf('}') === -1) {
+                    objectArr.push(nn[i])
+                    continue
+
+                } else if (nn[i].indexOf('}') !== -1) {
+                    objectArr.push(nn[i])
+                    mainArr.push(objectArr)
+                    objectArr = []
+
+                    //  setOutput(<li className='open' key={++id}>{ objectArr.join('\n')}</li>);
+                    //  objectArr =[]
+                }
+            }
+{/* <div> <input type="checkbox" for={el[0]} />   <p id={el[0]} className='open' onClick={handleClick} key={++id}>{el.join('\n')} </ p></div> */}
+            const splitOutput = mainArr.map(el => {
+                let elemnt = el.map(n => {
+                    if (n.indexOf(':') > -1) {
+                        let index = n.indexOf(':');
+                        let key = n.slice(0, index)
+                        let value = n.slice(index + 1, n.length)
+                        let isNum = value.indexOf('"') === -1 && value.indexOf('{') === -1 ? true : false;
+                        let isStr = value.indexOf('"') !== -1 && value.indexOf('{') === -1 ? true : false;
+                        // console.log('index of',value)
+                        return isNum ? <> <span>{key + ':'}</span> <span style={{ 'color': '#3FA0CF' }}>{value + '\n'}</span> </> : isStr ? <> <span>{key + ':'}</span> <span style={{ 'color': '#A9B6D8' }}>{value + '\n'}</span> </> : <span>{n + '\n'}</span>
+
+                    } else {
+                        return <span >{n + '\n'}</span>
+                    }
+                })
+                return <> <input type="checkbox" onChange={handleChange} />   <p className='open' key={++id}>{elemnt} </p></>
+            })
+            console.log('class', collapse)
+            console.log("Thisi main array", mainArr)
+            // const ss = nn.split(':')
+            const mm = nn.map(n => {
+                if (n.indexOf(':') > -1) {
+                    let index = n.indexOf(':');
+                    let key = n.slice(0, index)
+                    let value = n.slice(index + 1, n.length)
+                    let isNum = value.indexOf('"') === -1 && value.indexOf('{') === -1 ? true : false;
+                    let isStr = value.indexOf('"') !== -1 && value.indexOf('{') === -1 ? true : false;
+                    // console.log('index of',value)
+                    return isNum ? <> <span>{key + ':'}</span> <span style={{ 'color': '#3FA0CF' }}>{value + '\n'}</span> </> : isStr ? <> <span>{key + ':'}</span> <span style={{ 'color': '#A9B6D8' }}>{value + '\n'}</span> </> : <span>{n + '\n'}</span>
+
+                }
+                else {
+                    return <span>{n + '\n'}</span>
                 }
             })
-            console.log('splitting',nn)
             // const mm = nn.map(n=> <span style={{'color':'#004297f7'}}>{n+'\n'}</span>)
-
-
-
-
             outputRef.current.value = formated;
-            setOutput(mm);
+            setOutput(splitOutput);
             lineCountOut(outputRef.current.value)
             // console.log("Output", outputRef.current.value)
         } catch (error) {
             outputRef.current.value = error
-            console.log(error)
-            // setOutput(error)
+            console.dir(error)
+            setOutput(error.message)
         }
 
     }

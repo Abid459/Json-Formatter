@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 
 const Home = () => {
@@ -8,14 +8,9 @@ const Home = () => {
     const outputCountRef = useRef()
 
     const [output, setOutput] = useState();
-    const [collapse, setCollapse] = useState(true);
-
-
-    const handleChange = (e) => {
-        // setCollapse(!collapse);
-        // console.log(collapse)
-        console.dir("Reading checked",e.target.checked)
-    }
+    const [success, setSuccess] = useState(false)
+    const [copyClipboard, setcopyClipboard] = useState()
+    const[copySucced,setCopySucced] = useState(false)
 
     // scroll match of count and text editor
     const matchScroll = () => {
@@ -24,7 +19,6 @@ const Home = () => {
         inputCountRef.current.scrollLeft = inputRef.current.scrollLeft;
         outputCountRef.current.scrollTop = outputRef.current.scrollTop;
     }
-
 
     //Tab key functionallity
     const checkTabKey = (e) => {
@@ -49,99 +43,102 @@ const Home = () => {
             for (let i = 0; i < lineCount; i++) {
                 countArr[i] = (i + 1) + '.';
             }
-            // inputCountRef.current.value = countArr.join('\n')
             outputCountRef.current.value = countArr.join('\n')
         }
     }
 
-
     //Function for formating output
     const formatJSON = () => {
-        // setOutput('auesdaihsud')
         const inputData = inputRef.current.value
-        // const inputData = '{"name" : "abid","age":23, "others":{"hobby":"mango eating"}}'
-        // const b = JSON.parse(inputData)
-        // console.log('parse',b)
-        // console.log(typeof('input is',))
-        try {
-            const formated = JSON.stringify(JSON.parse(inputData), (key, value) => {
-                return typeof value === 'number' ? value : value
-            }, 4);
-            const nn = formated.split('\n');
 
-            // console.log("This is array",nn.split('}'))
+        try {
+            const formated = JSON.stringify(JSON.parse(inputData), null, 4);
+            setcopyClipboard(formated)
+            const splitedInput = formated.split('\n');
 
             let id = 0;
             let mainArr = []
             let objectArr = [];
-            let output
-            for (let i = 0; i < nn.length; i++) {
-                if (nn[i].indexOf('[') !== -1 || nn[i].indexOf(']') !== -1) {
-                    objectArr.push(nn[i])
+            for (let i = 0; i < splitedInput.length; i++) {
+                if (splitedInput[i].indexOf('[') !== -1 || splitedInput[i].indexOf(']') !== -1) {
+                    objectArr.push(splitedInput[i])
                     mainArr.push(objectArr)
                     objectArr = []
                     continue
                 }
 
-                else if (nn[i].indexOf('{') !== -1) {
-                    objectArr.push(nn[i])
-                } else if (nn[i].indexOf('}') === -1) {
-                    objectArr.push(nn[i])
+                else if (splitedInput[i].indexOf('{') !== -1) {
+                    objectArr.push(splitedInput[i])
+                } else if (splitedInput[i].indexOf('}') === -1) {
+                    objectArr.push(splitedInput[i])
                     continue
 
-                } else if (nn[i].indexOf('}') !== -1) {
-                    objectArr.push(nn[i])
+                } else if (splitedInput[i].indexOf('}') !== -1) {
+                    objectArr.push(splitedInput[i])
                     mainArr.push(objectArr)
                     objectArr = []
-
-                    //  setOutput(<li className='open' key={++id}>{ objectArr.join('\n')}</li>);
-                    //  objectArr =[]
                 }
             }
-{/* <div> <input type="checkbox" for={el[0]} />   <p id={el[0]} className='open' onClick={handleClick} key={++id}>{el.join('\n')} </ p></div> */}
-            const splitOutput = mainArr.map(el => {
-                let elemnt = el.map(n => {
-                    if (n.indexOf(':') > -1) {
-                        let index = n.indexOf(':');
-                        let key = n.slice(0, index)
-                        let value = n.slice(index + 1, n.length)
-                        let isNum = value.indexOf('"') === -1 && value.indexOf('{') === -1 ? true : false;
-                        let isStr = value.indexOf('"') !== -1 && value.indexOf('{') === -1 ? true : false;
-                        // console.log('index of',value)
-                        return isNum ? <> <span>{key + ':'}</span> <span style={{ 'color': '#3FA0CF' }}>{value + '\n'}</span> </> : isStr ? <> <span>{key + ':'}</span> <span style={{ 'color': '#A9B6D8' }}>{value + '\n'}</span> </> : <span>{n + '\n'}</span>
 
-                    } else {
-                        return <span >{n + '\n'}</span>
-                    }
-                })
-                return <> <input type="checkbox" onChange={handleChange} />   <p className='open' key={++id}>{elemnt} </p></>
-            })
-            console.log('class', collapse)
-            console.log("Thisi main array", mainArr)
-            // const ss = nn.split(':')
-            const mm = nn.map(n => {
-                if (n.indexOf(':') > -1) {
-                    let index = n.indexOf(':');
-                    let key = n.slice(0, index)
-                    let value = n.slice(index + 1, n.length)
-                    let isNum = value.indexOf('"') === -1 && value.indexOf('{') === -1 ? true : false;
+            // const splitOutput = mainArr.map(el => {
+            //     let elemnt = el.map(n => {
+            //         if (n.indexOf(':') > -1) {
+            //             let index = n.indexOf(':');
+            //             let key = n.slice(0, index)
+            //             let value = n.slice(index + 1, n.length)
+            //             let isNum = value.indexOf('"') === -1 && value.indexOf('{') === -1 ? true : false;
+            //             let isStr = value.indexOf('"') !== -1 && value.indexOf('{') === -1 ? true : false;
+            //             // console.log('index of',value)
+            //             return isNum ? <> <span>{key + ':'}</span> <span style={{ 'color': '#3FA0CF' }}>{value + '\n'}</span> </> : isStr ? <> <span>{key + ':'}</span> <span style={{ 'color': '#A9B6D8' }}>{value + '\n'}</span> </> : <span>{n + '\n'}</span>
+
+            //         } else {
+            //             return <span >{n + '\n'}</span>
+            //         }
+            //     })
+            //     return <> <input type="checkbox" onChange={handleChange} />   <p className='open' key={++id}>{elemnt} </p></>
+            // })
+
+            const colorSchema = splitedInput.map(singleLine => {
+                if (singleLine.indexOf(':') !== -1) {
+                    let index = singleLine.indexOf(':');
+                    let key = singleLine.slice(0, index + 1)
+                    let value = singleLine.slice(index + 1, singleLine.length)
+                    let isNum = value.indexOf('"') === -1 && value.indexOf('{') === -1 && value.indexOf('[') === -1 ? true : false;
                     let isStr = value.indexOf('"') !== -1 && value.indexOf('{') === -1 ? true : false;
-                    // console.log('index of',value)
-                    return isNum ? <> <span>{key + ':'}</span> <span style={{ 'color': '#3FA0CF' }}>{value + '\n'}</span> </> : isStr ? <> <span>{key + ':'}</span> <span style={{ 'color': '#A9B6D8' }}>{value + '\n'}</span> </> : <span>{n + '\n'}</span>
+                    let isBrace = (value.indexOf('[') !== -1 || value.indexOf('{') !== -1 || value.indexOf('}') !== -1 || value.indexOf(']') !== -1) ? true : false;
+
+                    setSuccess(true);
+                    if (isNum) {
+                        return <div>{key}<span style={{ 'color': '#C18FEB' }}>{value}</span></div>
+                    } else if (isStr) {
+                        return <div>{key}<span style={{ 'color': '#56E8FF' }}>{value}</span> </div>
+                    }
+                    else if(isBrace){
+                        return  <div>{key}<span style={{ 'color': '#FFF97B' }}>{value}</span> </div>
+                    }
+                    else {
+
+                        return <div>{singleLine}</div>
+                    }
+
 
                 }
                 else {
-                    return <span>{n + '\n'}</span>
+                    let isBraec = (singleLine.indexOf('[') !== -1 || singleLine.indexOf(']') !== -1 || singleLine.indexOf('{') !== -1 || singleLine.indexOf('}') !== -1) ? true : false;
+                    if (isBraec) {
+
+                        return <div style={{ 'color': '#FFF22A' }}>{singleLine}</div>
+                    }
+                    else {
+                        return <div style={{ 'color': '#ED8DB9' }}>{singleLine}</div>
+                    }
+                    // return <span style={{ 'color': '#ffffff' }}>{singleLine+'\n'}</span>
                 }
             })
-            // const mm = nn.map(n=> <span style={{'color':'#004297f7'}}>{n+'\n'}</span>)
             outputRef.current.value = formated;
-            setOutput(splitOutput);
+            setOutput(colorSchema);
             lineCountOut(outputRef.current.value)
-            // console.log("Output", outputRef.current.value)
         } catch (error) {
-            outputRef.current.value = error
-            console.dir(error)
             setOutput(error.message)
         }
 
@@ -153,9 +150,9 @@ const Home = () => {
         inputCountRef.current.value = '';
         outputCountRef.current.value = '';
         setOutput('')
+        setSuccess(false);
 
     }
-
 
     //Function to count input Line
     const lineCount = (e) => {
@@ -170,22 +167,35 @@ const Home = () => {
         }
     }
 
+    //
+    const handleCopy = () => {
+        const res = navigator.clipboard.writeText(copyClipboard);
+        if (res ? true : false) {
+            setCopySucced(true)
+          setTimeout(()=>setCopySucced(false),2000)  
+        }
+        console.log("copy response", )
+    }
 
 
     return (
         <div className='container'>
             <div className='input-Field'>
                 <textarea ref={inputCountRef} name="" id="" className='line-count' placeholder='1.' onScroll={matchScroll} readOnly></textarea>
-                <textarea className='text-field' name="" id="" spellcheck="false" ref={inputRef} onKeyDown={checkTabKey} onInput={lineCount} onScroll={matchScroll} placeholder="Input JSON .." wrap='off' >
+                <textarea className='text-field' name="" id="" spellCheck="false" ref={inputRef} onKeyDown={checkTabKey} onInput={lineCount} onScroll={matchScroll} placeholder="Input JSON .." wrap='off' >
                 </textarea>
             </div>
             <div className='btn'>
                 <button onClick={formatJSON}>FORMAT JSON</button>
                 <button onClick={clearField}>CLEAR DATA</button>
+                {success && <button class="btn" onClick={handleCopy}>COPY TO CLIPBOARD</button>}
             </div>
             <div className='output-Field'>
-                <textarea ref={outputCountRef} name="" id="" className='line-count' placeholder='1.' onScroll={matchScroll} readOnly></textarea>
-                <pre className='text-field' spellcheck="false" onScroll={matchScroll} ref={outputRef} wrap={false} >{output}</pre>
+                <textarea ref={outputCountRef} className='line-count' placeholder='1.' onScroll={matchScroll} readOnly></textarea>
+                <pre className='text-field' spellCheck="false" onScroll={matchScroll} ref={outputRef} wrap={false} >{output}</pre>
+            </div>
+            <div className={copySucced?'clipboard-notice':'clipboard-notice notice-hide'}>
+                <p>Coppied to clipboard</p>
             </div>
         </div>
     );

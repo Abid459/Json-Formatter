@@ -1,4 +1,5 @@
-import React, { useRef, useState } from 'react';
+import React, { useReducer, useRef, useState } from 'react';
+import ReactDOM from 'react-dom';
 
 
 const Home = () => {
@@ -6,11 +7,14 @@ const Home = () => {
     const inputCountRef = useRef()
     const outputRef = useRef()
     const outputCountRef = useRef()
-
+    const aaa = useRef(false)
     const [output, setOutput] = useState();
     const [success, setSuccess] = useState(false)
     const [copyClipboard, setcopyClipboard] = useState()
-    const[copySucced,setCopySucced] = useState(false)
+    const [copySucced, setCopySucced] = useState(false)
+
+
+    let id = 0;
 
     // scroll match of count and text editor
     const matchScroll = () => {
@@ -47,16 +51,93 @@ const Home = () => {
         }
     }
 
+
+    const handleClick = (e) => {
+        let node = ReactDOM.findDOMNode(e.target);
+        node.classList.toggle("caret-down");
+        console.log('nodeList', node)
+        node.querySelector(".nested").classList.toggle("hide");
+        node.querySelector(".nested-hiden-object").classList.toggle("active");
+        console.log("Thsi is node list", node.parentElement)
+    }
+    const handleClickArray = (e) => {
+        aaa.current = !aaa.current;
+        let node = ReactDOM.findDOMNode(e.currentTarget.parentElement.querySelector(".caretArray"));
+        node.classList.toggle("caretArray-down");
+        node.parentElement.querySelector(".nestedArr").classList.toggle("hide");
+        node.parentElement.querySelector(".nested-heden-array").classList.toggle("active");
+        // console.log('parent element', node.parentElement.querySelector(".nested"))
+
+    }
+
+
     //Function for formating output
     const formatJSON = () => {
         const inputData = inputRef.current.value
 
         try {
             const formated = JSON.stringify(JSON.parse(inputData), null, 4);
+            const parse = JSON.parse(inputData);
+            console.log('after parse', JSON.parse(inputData), null, 4)
+
+            let objectArrr = [];
+            const a = typeof (parse);
+            console.log(a)
+            let arrayEl = [];
+
+            function formatArray(key, value = null, tab = '    ') {
+                if (value === null) {
+                    const uu = parse.map(el => {
+                        console.log('this is iterating element', el)
+                        return formatObject(el, '        ')
+                    })
+                    arrayEl = [...uu];
+                    return <div><span style={{ 'color': '#FFF97B' }}>[</span>{arrayEl.map(e => <div>{e}</div>)}</div>
+                } else {
+
+                    arrayEl = [...value];
+                }
+                return <div onClick={handleClickArray} className='caretArray' >{tab}"{key}": <span style={{ 'color': '#FFF97B' }} >[</span><span className='nestedArr'> {arrayEl.map(e => <div className='nestedArr' style={{ 'color': '#ED8DB9' }}>{tab}{tab}"{e}",</div>)}</span>{tab}<span className='nested-heden-array hide'>...</span> <span style={{ 'color': '#FFF97B' }} >]</span></div>
+            }
+
+            function formatObject(items, tab = '    ') {
+                for (const item in items) {
+                    if (typeof (items[item]) === 'string') {
+                        objectArrr.push(<div>{tab}"{item}": <span style={{ 'color': '#56E8FF' }}>{JSON.stringify(items[item])},</span></div>)
+                    }
+                    else if (typeof (items[item]) === 'number') {
+                        objectArrr.push(<div>{tab}"{item}": <span style={{ 'color': '#C18FEB' }}>{items[item]},</span></div>)
+                    }
+                    else if (Array.isArray(items[item])) {
+                        objectArrr.push(formatArray(item, items[item], tab))
+                    }
+                    else if (typeof((items[item])) ==='object' && !Array.isArray(items[item])) {
+                        // console.log('we found a object',formatObject(items[item]))
+                        // formatObject(items[item])
+                    }
+
+                }
+                let objecTab = tab.length > 4 ? tab.slice(0, tab.length / 2) : '';
+
+                const output = <div key={++id} className='caret' onClick={handleClick}><span style={{ 'color': '#FFF97B' }}>{objecTab}&#123;</span><span className='nested'>{objectArrr}</span><span className='nested-hiden-object hide'>...</span>{objecTab}<span style={{ 'color': '#FFF97B' }} >&#125;</span>  </div>;
+                objectArrr = [];
+                return output;
+            }
+
+            if (a === 'object' && !Array.isArray(parse)) {
+                setOutput(formatObject(parse))
+
+            } else if (Array.isArray(parse)) {
+                const displayArray = formatArray(parse)
+                setOutput(displayArray)
+                console.log("Inside array element")
+            }
+
+
             setcopyClipboard(formated)
             const splitedInput = formated.split('\n');
 
-            let id = 0;
+
             let mainArr = []
             let objectArr = [];
             for (let i = 0; i < splitedInput.length; i++) {
@@ -79,64 +160,10 @@ const Home = () => {
                     objectArr = []
                 }
             }
+            console.log('This is main array', mainArr);
 
-            // const splitOutput = mainArr.map(el => {
-            //     let elemnt = el.map(n => {
-            //         if (n.indexOf(':') > -1) {
-            //             let index = n.indexOf(':');
-            //             let key = n.slice(0, index)
-            //             let value = n.slice(index + 1, n.length)
-            //             let isNum = value.indexOf('"') === -1 && value.indexOf('{') === -1 ? true : false;
-            //             let isStr = value.indexOf('"') !== -1 && value.indexOf('{') === -1 ? true : false;
-            //             // console.log('index of',value)
-            //             return isNum ? <> <span>{key + ':'}</span> <span style={{ 'color': '#3FA0CF' }}>{value + '\n'}</span> </> : isStr ? <> <span>{key + ':'}</span> <span style={{ 'color': '#A9B6D8' }}>{value + '\n'}</span> </> : <span>{n + '\n'}</span>
-
-            //         } else {
-            //             return <span >{n + '\n'}</span>
-            //         }
-            //     })
-            //     return <> <input type="checkbox" onChange={handleChange} />   <p className='open' key={++id}>{elemnt} </p></>
-            // })
-
-            const colorSchema = splitedInput.map(singleLine => {
-                if (singleLine.indexOf(':') !== -1) {
-                    let index = singleLine.indexOf(':');
-                    let key = singleLine.slice(0, index + 1)
-                    let value = singleLine.slice(index + 1, singleLine.length)
-                    let isNum = value.indexOf('"') === -1 && value.indexOf('{') === -1 && value.indexOf('[') === -1 ? true : false;
-                    let isStr = value.indexOf('"') !== -1 && value.indexOf('{') === -1 ? true : false;
-                    let isBrace = (value.indexOf('[') !== -1 || value.indexOf('{') !== -1 || value.indexOf('}') !== -1 || value.indexOf(']') !== -1) ? true : false;
-
-                    setSuccess(true);
-                    if (isNum) {
-                        return <div>{key}<span style={{ 'color': '#C18FEB' }}>{value}</span></div>
-                    } else if (isStr) {
-                        return <div>{key}<span style={{ 'color': '#56E8FF' }}>{value}</span> </div>
-                    }
-                    else if(isBrace){
-                        return  <div>{key}<span style={{ 'color': '#FFF97B' }}>{value}</span> </div>
-                    }
-                    else {
-
-                        return <div>{singleLine}</div>
-                    }
-
-
-                }
-                else {
-                    let isBraec = (singleLine.indexOf('[') !== -1 || singleLine.indexOf(']') !== -1 || singleLine.indexOf('{') !== -1 || singleLine.indexOf('}') !== -1) ? true : false;
-                    if (isBraec) {
-
-                        return <div style={{ 'color': '#FFF22A' }}>{singleLine}</div>
-                    }
-                    else {
-                        return <div style={{ 'color': '#ED8DB9' }}>{singleLine}</div>
-                    }
-                    // return <span style={{ 'color': '#ffffff' }}>{singleLine+'\n'}</span>
-                }
-            })
             outputRef.current.value = formated;
-            setOutput(colorSchema);
+            // setOutput(output);
             lineCountOut(outputRef.current.value)
         } catch (error) {
             setOutput(error.message)
@@ -172,9 +199,9 @@ const Home = () => {
         const res = navigator.clipboard.writeText(copyClipboard);
         if (res ? true : false) {
             setCopySucced(true)
-          setTimeout(()=>setCopySucced(false),2000)  
+            setTimeout(() => setCopySucced(false), 2000)
         }
-        console.log("copy response", )
+        console.log("copy response",)
     }
 
 
@@ -194,7 +221,7 @@ const Home = () => {
                 <textarea ref={outputCountRef} className='line-count' placeholder='1.' onScroll={matchScroll} readOnly></textarea>
                 <pre className='text-field' spellCheck="false" onScroll={matchScroll} ref={outputRef} wrap={false} >{output}</pre>
             </div>
-            <div className={copySucced?'clipboard-notice':'clipboard-notice notice-hide'}>
+            <div className={copySucced ? 'clipboard-notice' : 'clipboard-notice notice-hide'}>
                 <p>Coppied to clipboard</p>
             </div>
         </div>

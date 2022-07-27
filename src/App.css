@@ -48,9 +48,11 @@ input[type='checkbox']{
   position: absolute;
   left: 0px;
 }
-input[type='checkbox']:checked  .open{
-  /* height: 0px; */
-  display: none;
+.open{
+  color:red;
+}
+.close{
+  color:green;
 }
 
 .btn {
@@ -120,4 +122,40 @@ input[type='checkbox']:checked  .open{
 .text-field::-webkit-scrollbar-thumb:hover {
   background: rgba(85, 85, 85, 0.325);
   cursor: pointer;
+}
+
+
+
+/* Create the caret/arrow with a unicode, and style it */
+
+/* Style the caret/arrow */
+.caret, .caretArray {
+  cursor: pointer;
+  user-select: none; /* Prevent text selection */
+}
+.caret::before, .caretArray::before {
+  content: "\25B6";
+  color: rgb(105, 105, 105);
+  position: absolute;
+  left:0px;
+  transform: rotate(90deg);
+  /* display: inline-block; */
+  /* margin-right: 6px; */
+}
+.hide{
+  display:none;
+  /* color:red; */
+}
+
+/* Rotate the caret/arrow icon when clicked on (using JavaScript) */
+.caret-down::before, .caretArray-down::before {
+  transform: rotate(0deg);
+}
+.nested {
+  /* display: block; */
+}
+
+/* Show the nested list when the user clicks on the caret/arrow (with JavaScript) */
+.active {
+  display: inline;
 }
